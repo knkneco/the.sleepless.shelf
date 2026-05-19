@@ -276,7 +276,6 @@
                 const opt = document.createElement('option');
                 opt.value = member.emoji;
                 opt.innerText = `${member.emoji} ${member.name}`;
-                // デフォルトでいとさんや特定の初期設定をする場合はここでフックできます
                 if(id === 'credit_thumbnail' && member.name === 'いと') opt.selected = true;
                 select.appendChild(opt);
             });
@@ -306,7 +305,6 @@
             return;
         }
 
-// キャストライン生成
         const selects = document.querySelectorAll('.cast-member-select');
         let castLines = [];
         let castNamesTags = [];
@@ -327,7 +325,7 @@
                     castLines.push(`　　　　　　　${member.emoji} ${member.roleStr} / ${member.name}`);
                     castLines.push(`　　　　　　　${member.url}`);
                 }
-                castNamesTags.push(member.name.replace(/[🥜🔑🔮☯️🌱︎︎︎🐈‍⬛]/g, '')); // タグ用にお名前から記号・絵文字を簡易除去
+                castNamesTags.push(member.name.replace(/[🥜🔑🔮☯️🌱︎︎︎🐈‍⬛]/g, ''));
             }
         });
 
@@ -338,7 +336,6 @@
             return;
         }
         
-		// 歌詞処理（全角スペース2つ追加）
         let formattedLyrics = "";
         if (lyricsInput.trim()) {
             formattedLyrics = lyricsInput.split('\n').map(line => {
@@ -346,10 +343,9 @@
             }).join('\n');
         }
 
-		// クレジットセレクトボックス処理
-		let creditBlocks = [];
+        let creditBlocks = [];
         const credConfigs = [
-            { id: 'credit_thumbnail', label: '⧉  𝑇ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙' },
+            { id: 'credit_thumbnail', label: '⧉ 𝑇ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙' },
             { id: 'credit_illustration', label: '⧉ 𝐼𝑙𝑙𝑢𝑠𝑡' },
             { id: 'credit_mix', label: '⧉ 𝑀𝑖𝑥' },
             { id: 'credit_movie', label: '⧉ 𝑀𝑜𝑣𝑖𝑒' }
@@ -367,7 +363,6 @@
 
         const formattedCredit = creditBlocks.length > 0 ? creditBlocks.join('\n') : "　(クレジットなし)";
       
-      // ハッシュタグ
         const tagsSection = `📚 𝑇𝑎𝑔𝑠\n　#TheSleeplessShelf #童話ユニット\n　#nana民と繋がりたい #拍手返します\n　#${songTitle} #${artistName}\n　${castNamesTags.map(name => `#${name.trim()}`).join(' ')}`;
 
         const finalCaption = `📙 𓂃 𝑇ℎ𝑒 𝑂𝑛𝑒 𝐵𝑜𝑜𝑘 𝑜𝑛 𝑡ℎ𝑒 𝑆ℎ𝑒𝑙𝑓 𓈒𓂂
@@ -376,7 +371,6 @@ ${castLines.join('\n')}
 📖 𝑆𝑜𝑛𝑔　 ：${songTitle} / ${artistName} 様
 🎼 𝑂𝑟𝑖𝑔𝑖𝑛𝑎𝑙  ：${originalUrl}
 🎹 𝐼𝑛𝑠𝑡　 　：本家 様
-
 
 🕯️ 𝐿𝑦𝑟𝑖𝑐
 
