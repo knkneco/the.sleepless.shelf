@@ -168,7 +168,7 @@
 	            <select id="credit_thumbnail" class="credit-staff-select"><option value="">-- 担当なし --</option></select>
 	        </div>
 	        <div class="credit-row">
-	            <span class="credit-label">⧉ 𝐼𝑙𝑙𝑢𝑠𝑡𝑟𝑎𝑡𝑖𝑜𝑛</span>
+	            <span class="credit-label">⧉ 𝐼𝑙𝑙𝑢𝑠𝑡</span>
 	            <select id="credit_illustration" class="credit-staff-select"><option value="">-- 担当なし --</option></select>
 	        </div>
 	        <div class="credit-row">
@@ -321,7 +321,7 @@
                 activeCount++;
                 
                 if (activeCount === 1) {
-                    castLines.push(`🎙️ 𝘊𝘢𝘴𝘵　　：${member.emoji} ${member.roleStr} / ${member.name}`);
+                    castLines.push(`🎙️ 𝐶𝑎𝑠𝑡　　：${member.emoji} ${member.roleStr} / ${member.name}`);
                     castLines.push(`　　　　　　　${member.url}`);
                 } else {
                     castLines.push(`　　　　　　　${member.emoji} ${member.roleStr} / ${member.name}`);
@@ -349,10 +349,10 @@
 		// クレジットセレクトボックス処理
 		let creditBlocks = [];
         const credConfigs = [
-            { id: 'credit_thumbnail', label: '⧉ 𝘛𝘩𝘶𝘮𝘣𝘯𝘢𝘪𝘭' },
-            { id: 'credit_illustration', label: '⧉ 𝘐𝘭𝘭𝘶𝘴𝘵𝘳𝘢𝘵𝘪𝘰𝘯' },
-            { id: 'credit_mix', label: '⧉ 𝘔𝘪𝘹' },
-            { id: 'credit_movie', label: '⧉ 𝘔𝘰𝘷𝘪𝘦' }
+            { id: 'credit_thumbnail', label: '⧉  𝑇ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙' },
+            { id: 'credit_illustration', label: '⧉ 𝐼𝑙𝑙𝑢𝑠𝑡' },
+            { id: 'credit_mix', label: '⧉ 𝑀𝑖𝑥' },
+            { id: 'credit_movie', label: '⧉ 𝑀𝑜𝑣𝑖𝑒' }
         ];
 
         credConfigs.forEach(cfg => {
@@ -368,27 +368,30 @@
         const formattedCredit = creditBlocks.length > 0 ? creditBlocks.join('\n') : "　(クレジットなし)";
       
       // ハッシュタグ
-        const tagsSection = `📚 𝘛𝘢𝘨𝘴\n　#TheSleeplessShelf #童話ユニット\n　#nana民と繋がりたい #拍手返します\n　#${songTitle} #${artistName}\n　${castNamesTags.map(name => `#${name.trim()}`).join(' ')}`;
+        const tagsSection = `📚 𝑇𝑎𝑔𝑠\n　#TheSleeplessShelf #童話ユニット\n　#nana民と繋がりたい #拍手返します\n　#${songTitle} #${artistName}\n　${castNamesTags.map(name => `#${name.trim()}`).join(' ')}`;
 
         const finalCaption = `📙 𓂃 𝑇ℎ𝑒 𝑂𝑛𝑒 𝐵𝑜𝑜𝑘 𝑜𝑛 𝑡ℎ𝑒 𝑆ℎ𝑒𝑙𝑓 𓈒𓂂
 
 ${castLines.join('\n')}
-📖 𝘚𝘰𝘯𝘨　 ：${songTitle} / ${artistName} 様
-🎼 𝘖𝘳𝘪𝘨𝘪𝘯𝘢𝘭 ：${originalUrl}
+📖 𝑆𝑜𝑛𝑔　 ：${songTitle} / ${artistName} 様
+🎼 𝑂𝑟𝑖𝑔𝑖𝑛𝑎𝑙  ：${originalUrl}
+🎹 𝐼𝑛𝑠𝑡　 　：本家 様
 
-🕯️ 𝘓𝘺𝘳𝘪𝘤
+
+🕯️ 𝐿𝑦𝑟𝑖𝑐
 
 ${formattedLyrics}
 
-🗝️ 𝘊𝘳𝘦𝘥𝘪𝘵
+🗝️ 𝐶𝑟𝑒𝑑𝑖𝑡
+
 ${formattedCredit}
 
 ${tagsSection}
 
-🌙 𝘗𝘳𝘦𝘴𝘦𝘯𝘵𝘦𝘥 𝘣𝘺
+🌙 𝑃𝑟𝑒𝑠𝑒𝑛𝑡𝑒𝑑 𝑏𝑦
 　　　　nana-music.com/users/10683766
 
-📖 𓈒 𝘛𝘩𝘢𝘯𝘬 𝘠𝘰🇺 𝘧𝘰𝘳 𝘙𝘦𝘢𝘥𝘪𝘯𝘨 ! 𓂃𓏸`;
+📖 𓈒 𝑇ℎ𝑎𝑛𝑘 𝑌𝑜𝑢 𝑓𝑜𝑟 𝑅𝑒𝑎𝑑𝑖𝑛𝑔 ! 𓂃𓏸`;
 
         output.value = finalCaption;
         resultContainer.style.display = 'block';
