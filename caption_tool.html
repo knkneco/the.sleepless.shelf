@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The One Book キャプション制作助手</title>
+    <style>
+        :root {
+            --primary-color: #d4af37;
+            --bg-color: #fcfbf7;
+            --text-color: #333;
+            --border-color: #e0dbcd;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #555;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #444;
+            font-size: 0.9rem;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            background-color: #fff;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+        }
+        textarea {
+            resize: vertical;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #2d3748;
+        }
+        .btn-copy {
+            background-color: var(--primary-color);
+            margin-top: 10px;
+        }
+        .btn-copy:hover {
+            background-color: #b8952b;
+        }
+        .result-container {
+            margin-top: 30px;
+            display: none;
+        }
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        /* コピペ用プレーンテキスト表示エリア (枠線を消して通常の文字に見せる) */
+        #output {
+            width: 100%;
+            height: 450px;
+            padding: 15px;
+            border: 1px dashed var(--border-color);
+            background-color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            white-space: pre;
+            overflow-x: auto;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .error-msg {
+            color: #c53030;
+            background-color: #fff5f5;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            display: none;
+            border: 1px solid #fed7d7;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📙 The One Book キャプション制作助手</h1>
+
+    <div class="form-group">
+        <label>① 曲名</label>
+        <input type="text" id="songTitle" placeholder="例：お気に召すまま">
+    </div>
+
+    <div class="form-group">
+        <label>② アーティスト名</label>
+        <input type="text" id="artistName" placeholder="例：Eve">
+    </div>
+
+    <div class="form-group">
+        <label>③ 本家（Original）URL</label>
+        <input type="text" id="originalUrl" placeholder="例：https://youtu.be/...">
+    </div>
+
+	<div class="form-group">
+	    <label>④ キャスト選択</label>
+	    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+	        <span style="font-size: 0.9rem; color: #555; font-weight: bold;">出演人数：</span>
+	        <select id="castCount" style="width: auto; padding: 5px 10px;" onchange="updateCastSelectors()">
+	            <option value="1">1人</option>
+	            <option value="2">2人</option>
+	            <option value="3">3人</option>
+	            <option value="4">4人</option>
+	            <option value="5">5人</option>
+	            <option value="6">6人</option>
+	            <option value="7">7人</option>
+	            <option value="8">8人</option>
+	            <option value="9">9人</option>
+	            <option value="10">10人</option>
+	        </select>
+	    </div>
+	    <div class="cast-select-container" id="castSelectArea">
+	        <!-- JavaScriptで人数分のセレクトボックスを生成 -->
+	    </div>
+	</div>
+
+    <div class="form-group">
+        <label>⑤ 歌詞</label>
+        <textarea id="lyrics" rows="8" placeholder="提供された歌詞をそのまま貼り付けてください"></textarea>
+    </div>
+
+	<div class="form-group">
+	    <label>⑥ クレジット（各役割担当者：任意/null選択可能）</label>
+	    <div class="credit-select-container">
+	        <div class="credit-row">
+	            <span class="credit-label">⧉ 𝑇ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙</span>
+	            <select id="credit_thumbnail" class="credit-staff-select"><option value="">-- 担当なし --</option></select>
+	        </div>
+	        <div class="credit-row">
+	            <span class="credit-label">⧉ 𝐼𝑙𝑙𝑢𝑠𝑡𝑟𝑎𝑡𝑖𝑜𝑛</span>
+	            <select id="credit_illustration" class="credit-staff-select"><option value="">-- 担当なし --</option></select>
+	        </div>
+	        <div class="credit-row">
+	            <span class="credit-label">⧉ 𝑀𝑖𝑥</span>
+	            <select id="credit_mix" class="credit-staff-select"><option value="">-- 担当なし --</option></select>
+	        </div>
+	        <div class="credit-row">
+	            <span class="credit-label">⧉ 𝑀𝑜𝑣𝑖𝑒</span>
+	            <select id="credit_movie" class="credit-staff-select"><option value="">-- 担当なし --</option></select>
+	        </div>
+	    </div>
+	</div>
+
+    <button type="button" onclick="generateCaption()">✨ キャプションを生成する</button>
+
+    <div class="error-msg" id="errorArea"></div>
+
+    <div class="result-container" id="resultContainer">
+        <div class="result-title">📋 生成されたキャプション (そのままコピーできます)</div>
+        <textarea id="output" readonly></textarea>
+        <button type="button" class="btn-copy" onclick="copyToClipboard()">📱 全文をコピーする</button>
+    </div>
+
+<script>
+    // ==========================================
+    // 修正版：最新24名 キャストマスターデータ
+    // ==========================================
+    const castMaster = [
+        { emoji: "🫖", roleStr: "𝐴𝑙𝑖𝑐𝑒", name: "猫田りん", url: "nana-music.com/users/9031646" },
+        { emoji: "🧣", roleStr: "𝐿𝑖𝑡𝑡𝑙𝑒 𝑅𝑒𝑑 𝑅𝑖𝑑𝑖𝑛𝑔 𝐻𝑜𝑜𝑑", name: "いと", url: "nana-music.com/users/8025666" },
+        { emoji: "🍎", roleStr: "𝑆𝑛𝑜𝑤 𝑊ℎ𝑖𝑡𝑒", name: "つきの", url: "nana-music.com/users/1196560" },
+        { emoji: "👠", roleStr: "𝐶𝑖𝑛𝑑𝑒𝑟𝑒𝑙𝑙𝑎", name: "二千夏", url: "nana-music.com/users/10453169" },
+        { emoji: "🫧", roleStr: "𝐿𝑖𝑡𝑡𝑙𝑒 𝑀𝑒𝑟𝑚𝑎𝑖𝑑", name: "朱音", url: "nana-music.com/users/10641755" },
+        { emoji: "🌷", roleStr: "𝑇ℎ𝑢𝑚𝑏𝑒𝑙𝑖𝑛𝑎", name: "aya", url: "nana-music.com/users/1710261" },
+        { emoji: "🗡️", roleStr: "𝑃𝑒𝑡𝑒𝑟 𝑃𝑎𝑛", name: "せん", url: "nana-music.com/users/10664270" },
+        { emoji: "💫", roleStr: "𝐿𝑖𝑡𝑡𝑙𝑒 𝑃𝑟𝑖𝑛𝑐𝑒", name: "紅葉-kureha-", url: "nana-music.com/users/2331892" },
+        { emoji: "🌹", roleStr: "𝑆𝑙𝑒𝑒𝑝𝑖𝑛𝑔 𝐵𝑒𝑎𝑢𝑡𝑦", name: "きゃん", url: "nana-music.com/users/1955080" },
+        { emoji: "🐺", roleStr: "𝑊𝑜𝑙𝑓", name: "らいち", url: "nana-music.com/users/6487779" },
+        { emoji: "🦢", roleStr: "𝑃𝑟𝑖𝑛𝑐𝑒𝑠𝑠 𝑂𝑑𝑒𝑡𝑡𝑒", name: "猫実", url: "nana-music.com/users/10608122" }, 
+        { emoji: "🪔", roleStr: "𝐴𝑙𝑎𝑑𝑑𝑖𝑛", name: "侫", url: "nana-music.com/users/10324554" },
+        { emoji: "🌿", roleStr: "𝐹𝑎𝑖𝑟𝑦 𝑄𝑢𝑒𝑒𝑛", name: "𝙍𝙪𝙢𝙞︎︎︎", url: "nana-music.com/users/3690678" },
+        { emoji: "🛋️", roleStr: "𝐹𝑎𝑦𝑟𝑢𝑛𝑒", name: "まぐかっぷ。", url: "nana-music.com/users/10497669" },
+        { emoji: "🍪", roleStr: "𝐻𝑎𝑛𝑠𝑒𝑙", name: "🔮カラス☯️", url: "nana-music.com/users/2232850" },
+        { emoji: "🍭", roleStr: "𝐺𝑟𝑒𝑡𝑒𝑙", name: "🌱ちょこどーる", url: "nana-music.com/users/10327634" },
+        { emoji: "🔮", roleStr: "𝑇𝑖𝑛𝑘𝑒𝑟 𝐵𝑒𝑙𝑙", name: "𝙰𝙼𝙴𝚁𝙸", url: "nana-music.com/users/10600187" },
+        { emoji: "🪞", roleStr: "𝑀𝑎𝑔𝑖𝑐 𝑀𝑖𝑟𝑟𝑜𝑟", name: "ゆいきぃ🔑", url: "nana-music.com/users/8521383" },
+        { emoji: "😈", roleStr: "𝐺𝑟𝑖𝑚ℎ𝑖𝑙𝑑", name: "赤沢みや", url: "nana-music.com/users/2019485" },
+        { emoji: "🐦‍⬛", roleStr: "𝑀𝑎𝑙𝑒𝑓𝑖𝑐𝑒𝑛𝑡", name: "おいか🐈‍⬛", url: "nana-music.com/users/10615013" },
+        { emoji: "⚔️", roleStr: "𝑆𝑡𝑒𝑎𝑑𝑓𝑎𝑠𝑡 𝑇𝑖𝑛 𝑆𝑜𝑙𝑑𝑖𝑒𝑟", name: "月城 魅莉", url: "nana-music.com/users/9704825" },
+        { emoji: "🎋", roleStr: "𝑃𝑟𝑖𝑛𝑐𝑒𝑠𝑠 𝐾𝑎𝑔𝑢𝑦𝑎", name: "みおねこ", url: "nana-music.com/users/7262313" },
+        { emoji: "🌟", roleStr: "𝑃𝑖𝑛𝑜𝑐𝑐ℎ𝑖𝑜", name: "ぴーなっつ🥜", url: "nana-music.com/users/8619961" },
+        { emoji: "💇‍♀️", roleStr: "𝑅𝑎𝑝𝑢𝑛𝑧𝑒𝑙", name: "黝玻-くろは-", url: "nana-music.com/users/7439415" }
+    ];
+
+    window.onload = function() {
+        updateCastSelectors();
+        initCreditSelectors();
+    };
+
+    function updateCastSelectors() {
+        const count = parseInt(document.getElementById('castCount').value);
+        const container = document.getElementById('castSelectArea');
+        container.innerHTML = '';
+
+        for (let i = 1; i <= count; i++) {
+            const row = document.createElement('div');
+            row.className = 'cast-row';
+
+            const label = document.createElement('span');
+            label.className = 'cast-num';
+            label.innerText = `${i}人目：`;
+
+            const select = document.createElement('select');
+            select.className = 'cast-member-select';
+            select.id = `cast_select_${i}`;
+
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = "";
+            defaultOpt.innerText = "-- キャストを選択 --";
+            select.appendChild(defaultOpt);
+
+            castMaster.forEach((member, index) => {
+                const opt = document.createElement('option');
+                opt.value = member.emoji;
+                opt.innerText = `${member.emoji} ${member.name} (${member.roleStr})`;
+                
+                if (i === index + 1) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+
+            row.appendChild(label);
+            row.appendChild(select);
+            container.appendChild(row);
+        }
+    }
+    
+    function initCreditSelectors() {
+        const creditIds = ['credit_thumbnail', 'credit_illustration', 'credit_mix', 'credit_movie'];
+        
+        creditIds.forEach(id => {
+            const select = document.getElementById(id);
+            castMaster.forEach(member => {
+                const opt = document.createElement('option');
+                opt.value = member.emoji;
+                opt.innerText = `${member.emoji} ${member.name}`;
+                // デフォルトでいとさんや特定の初期設定をする場合はここでフックできます
+                if(id === 'credit_thumbnail' && member.name === 'いと') opt.selected = true;
+                select.appendChild(opt);
+            });
+        });
+    }
+
+    function generateCaption() {
+        const songTitle = document.getElementById('songTitle').value.trim();
+        const artistName = document.getElementById('artistName').value.trim();
+        const originalUrl = document.getElementById('originalUrl').value.trim();
+        const lyricsInput = document.getElementById('lyrics').value;
+        const errorArea = document.getElementById('errorArea');
+        const resultContainer = document.getElementById('resultContainer');
+        const output = document.getElementById('output');
+        
+        errorArea.style.display = 'none';
+        
+        let missingFields = [];
+        if (!songTitle) missingFields.push("①曲名");
+        if (!artistName) missingFields.push("②アーティスト名");
+        if (!originalUrl) missingFields.push("③本家URL");
+        
+        if (missingFields.length > 0) {
+            errorArea.innerText = `⚠️ 以下の項目が不足しています：\n・${missingFields.join('\n・')}`;
+            errorArea.style.display = 'block';
+            resultContainer.style.display = 'none';
+            return;
+        }
+
+// キャストライン生成
+        const selects = document.querySelectorAll('.cast-member-select');
+        let castLines = [];
+        let castNamesTags = [];
+        let activeCount = 0;
+
+        selects.forEach((select) => {
+            const emoji = select.value;
+            if (!emoji) return;
+
+            const member = castMaster.find(m => m.emoji === emoji);
+            if (member) {
+                activeCount++;
+                
+                if (activeCount === 1) {
+                    castLines.push(`🎙️ 𝘊𝘢𝘴𝘵　　：${member.emoji} ${member.roleStr} / ${member.name}`);
+                    castLines.push(`　　　　　　　${member.url}`);
+                } else {
+                    castLines.push(`　　　　　　　${member.emoji} ${member.roleStr} / ${member.name}`);
+                    castLines.push(`　　　　　　　${member.url}`);
+                }
+                castNamesTags.push(member.name.replace(/[🥜🔑🔮☯️🌱︎︎︎🐈‍⬛]/g, '')); // タグ用にお名前から記号・絵文字を簡易除去
+            }
+        });
+
+        if (activeCount === 0) {
+            errorArea.innerText = `⚠️ キャストが選択されていません。1人以上選択してください。`;
+            errorArea.style.display = 'block';
+            resultContainer.style.display = 'none';
+            return;
+        }
+        
+		// 歌詞処理（全角スペース2つ追加）
+        let formattedLyrics = "";
+        if (lyricsInput.trim()) {
+            formattedLyrics = lyricsInput.split('\n').map(line => {
+                return line.trim() === "" ? "" : "　　" + line;
+            }).join('\n');
+        }
+
+		// クレジットセレクトボックス処理
+		let creditBlocks = [];
+        const credConfigs = [
+            { id: 'credit_thumbnail', label: '⧉ 𝘛𝘩𝘶𝘮𝘣𝘯𝘢𝘪𝘭' },
+            { id: 'credit_illustration', label: '⧉ 𝘐𝘭𝘭𝘶𝘴𝘵𝘳𝘢𝘵𝘪𝘰𝘯' },
+            { id: 'credit_mix', label: '⧉ 𝘔𝘪𝘹' },
+            { id: 'credit_movie', label: '⧉ 𝘔𝘰𝘷𝘪𝘦' }
+        ];
+
+        credConfigs.forEach(cfg => {
+            const val = document.getElementById(cfg.id).value;
+            if (val) {
+                const member = castMaster.find(m => m.emoji === val);
+                if (member) {
+                    creditBlocks.push(`　${cfg.label}：${member.name}\n　　　　　　　　${member.url}`);
+                }
+            }
+        });
+
+        const formattedCredit = creditBlocks.length > 0 ? creditBlocks.join('\n') : "　(クレジットなし)";
+      
+      // ハッシュタグ
+        const tagsSection = `📚 𝘛𝘢𝘨𝘴\n　#TheSleeplessShelf #童話ユニット\n　#nana民と繋がりたい #拍手返します\n　#${songTitle} #${artistName}\n　${castNamesTags.map(name => `#${name.trim()}`).join(' ')}`;
+
+        const finalCaption = `📙 𓂃 𝑇ℎ𝑒 𝑂𝑛𝑒 𝐵𝑜𝑜𝑘 𝑜𝑛 𝑡ℎ𝑒 𝑆ℎ𝑒𝑙𝑓 𓈒𓂂
+
+${castLines.join('\n')}
+📖 𝘚𝘰𝘯𝘨　 ：${songTitle} / ${artistName} 様
+🎼 𝘖𝘳𝘪𝘨𝘪𝘯𝘢𝘭 ：${originalUrl}
+
+🕯️ 𝘓𝘺𝘳𝘪𝘤
+
+${formattedLyrics}
+
+🗝️ 𝘊𝘳𝘦𝘥𝘪𝘵
+${formattedCredit}
+
+${tagsSection}
+
+🌙 𝘗𝘳𝘦𝘴𝘦𝘯𝘵𝘦𝘥 𝘣𝘺
+　　　　nana-music.com/users/10683766
+
+📖 𓈒 𝘛𝘩𝘢𝘯𝘬 𝘠𝘰🇺 𝘧𝘰𝘳 𝘙𝘦𝘢𝘥𝘪𝘯𝘨 ! 𓂃𓏸`;
+
+        output.value = finalCaption;
+        resultContainer.style.display = 'block';
+        resultContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyToClipboard() {
+        const outputTextarea = document.getElementById('output');
+        outputTextarea.select();
+        outputTextarea.setSelectionRange(0, 99999);
+
+        try {
+            navigator.clipboard.writeText(outputTextarea.value);
+            alert("✨ キャプションをクリップボードにコピーしました！そのままnanaに貼り付けられます。");
+        } catch (err) {
+            document.execCommand('copy');
+            alert("✨ キャプションをコピーしました！");
+        }
+    }
+</script>
+</body>
+</html>
