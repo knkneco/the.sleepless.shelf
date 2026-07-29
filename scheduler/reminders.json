@@ -1,0 +1,16 @@
+{
+  "timezone": "Asia/Tokyo",
+  "reminders": [
+    {
+      "id": "monthly-volunteer-reminder",
+      "enabled": false,
+      "schedule": {
+        "type": "monthly",
+        "day": 30,
+        "time": "00:00"
+      },
+      "mention": "<@422070696735277058>",
+      "message": "【テスト】The Sleepless Shelf Schedulerからの通知です🌙"
+    }
+  ]
+}
