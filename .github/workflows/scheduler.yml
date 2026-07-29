@@ -22,13 +22,15 @@ jobs:
       - name: Test Send
         if: github.event_name == 'workflow_dispatch'
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK_STAFF: ${{ secrets.DISCORD_WEBHOOK_STAFF }}
+          DISCORD_WEBHOOK_PUBLIC: ${{ secrets.DISCORD_WEBHOOK_PUBLIC }}
         run: |
           python scheduler/send_reminder.py --test
 
       - name: Scheduled Send
         if: github.event_name == 'schedule'
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK_STAFF: ${{ secrets.DISCORD_WEBHOOK_STAFF }}
+          DISCORD_WEBHOOK_PUBLIC: ${{ secrets.DISCORD_WEBHOOK_PUBLIC }}
         run: |
           python scheduler/send_reminder.py
