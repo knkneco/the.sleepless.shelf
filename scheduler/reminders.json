@@ -1,16 +1,19 @@
 {
-  "timezone": "Asia/Tokyo",
-  "reminders": [
-    {
-      "id": "shuffle-roll-call",
-      "enabled": true,
-      "schedule": {
-        "type": "monthly",
-        "day": 25,
-        "time": "17:00"
-      },
-      "mention": "<@422070696735277058>",
-      "message": "📚25日！シャッフルの点呼です！\n参加者の確認をお願いします！"
-    }
-  ]
+	"timezone": "Asia/Tokyo",
+	"reminders": [
+		{
+			"id": "shuffle-roll-call",
+			"enabled": true,
+			"schedule": {
+				"type": "monthly",
+				"day": 25,
+				"time": "17:00"
+			},
+			"channel": "planning",
+			"mention": "<@422070696735277058>",
+			"title": "📚シャッフル点呼",
+			"message": "シャッフル企画の点呼をお願いします！",
+			"color": "#FFD966"
+		}
+	]
 }
