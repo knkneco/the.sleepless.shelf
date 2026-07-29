@@ -2,15 +2,15 @@
   "timezone": "Asia/Tokyo",
   "reminders": [
     {
-      "id": "monthly-volunteer-reminder",
-      "enabled": false,
+      "id": "shuffle-roll-call",
+      "enabled": true,
       "schedule": {
         "type": "monthly",
-        "day": 30,
-        "time": "00:00"
+        "day": 25,
+        "time": "17:00"
       },
-      "mention": "<@422070696735277058>",
-      "message": "【テスト】The Sleepless Shelf Schedulerからの通知です🌙"
+      "mention": "<@714805032062550067>",
+      "message": "📚シャッフルの点呼開始です！\n参加者の確認をお願いします！"
     }
   ]
 }
