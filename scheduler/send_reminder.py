@@ -13,30 +13,62 @@ CONFIG_PATH = Path("scheduler/reminders.json")
 
 
 def load_config() -> dict:
+    """
+    reminders.json を読み込む。
+    """
+
     if not CONFIG_PATH.exists():
         raise FileNotFoundError(
             f"設定ファイルが見つかりません: {CONFIG_PATH}"
         )
 
-    with CONFIG_PATH.open("r", encoding="utf-8") as file:
+    with CONFIG_PATH.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
         return json.load(file)
 
 
-def add_months(year: int, month: int, amount: int) -> tuple[int, int]:
-    month_index = year * 12 + (month - 1) + amount
+def add_months(
+    year: int,
+    month: int,
+    amount: int,
+) -> tuple[int, int]:
+    """
+    指定した年月に amount ヶ月を加算する。
+    """
+
+    month_index = (
+        year * 12
+        + (month - 1)
+        + amount
+    )
+
     new_year = month_index // 12
     new_month = month_index % 12 + 1
+
     return new_year, new_month
 
 
-def format_message(template: str, now: datetime) -> str:
+def format_message(
+    template: str,
+    now: datetime,
+) -> str:
+    """
+    メッセージ内の変数を
+    実際の年月などに置き換える。
+    """
+
     next_year, next_month = add_months(
         now.year,
         now.month,
         1,
     )
 
-    month_after_next_year, month_after_next = add_months(
+    (
+        month_after_next_year,
+        month_after_next,
+    ) = add_months(
         now.year,
         now.month,
         2,
@@ -50,33 +82,40 @@ def format_message(template: str, now: datetime) -> str:
     return template.format(
         current_year=now.year,
         current_month=now.month,
+
         next_year=next_year,
         next_month=next_month,
-        month_after_next_year=month_after_next_year,
-        month_after_next=month_after_next,
+
+        month_after_next_year=(
+            month_after_next_year
+        ),
+        month_after_next=(
+            month_after_next
+        ),
+
         last_day=last_day,
     )
 
 
 def load_webhooks() -> dict[str, str]:
-    webhooks = {
-        "staff": os.environ.get("DISCORD_WEBHOOK_STAFF", ""),
-        "public": os.environ.get("DISCORD_WEBHOOK_PUBLIC", ""),
+    """
+    Discord Webhook URLを
+    GitHub Secretsから取得する。
+
+    未使用のWebhookが未設定でも
+    この段階ではエラーにしない。
+    """
+
+    return {
+        "staff": os.environ.get(
+            "DISCORD_WEBHOOK_STAFF",
+            "",
+        ),
+        "public": os.environ.get(
+            "DISCORD_WEBHOOK_PUBLIC",
+            "",
+        ),
     }
-
-    missing_webhooks = [
-        name
-        for name, url in webhooks.items()
-        if not url
-    ]
-
-    if missing_webhooks:
-        raise RuntimeError(
-            "GitHub Secretが設定されていません: "
-            + ", ".join(missing_webhooks)
-        )
-
-    return webhooks
 
 
 def send_to_discord(
@@ -84,7 +123,17 @@ def send_to_discord(
     mention: str,
     message: str,
 ) -> None:
-    content = f"{mention}\n{message}".strip()
+    """
+    Discord Webhookへ送信する。
+    """
+
+    if mention:
+        content = (
+            f"{mention}\n"
+            f"{message}"
+        )
+    else:
+        content = message
 
     payload = {
         "content": content,
@@ -92,16 +141,26 @@ def send_to_discord(
             "parse": [
                 "users",
                 "roles",
-            ]
+            ],
         },
     }
 
+    data = json.dumps(
+        payload,
+        ensure_ascii=False,
+    ).encode("utf-8")
+
     request = urllib.request.Request(
         webhook_url,
-        data=json.dumps(payload).encode("utf-8"),
+        data=data,
         headers={
-            "Content-Type": "application/json",
-            "User-Agent": "The-Sleepless-Shelf-Scheduler/1.0",
+            "Content-Type": (
+                "application/json"
+            ),
+            "User-Agent": (
+                "The-Sleepless-Shelf-"
+                "Scheduler/1.0"
+            ),
         },
         method="POST",
     )
@@ -111,10 +170,16 @@ def send_to_discord(
             request,
             timeout=30,
         ) as response:
-            if response.status not in (200, 204):
+
+            if response.status not in (
+                200,
+                204,
+            ):
                 raise RuntimeError(
-                    "Discordへの送信に失敗しました。"
-                    f"HTTP {response.status}"
+                    "Discordへの送信に"
+                    "失敗しました。"
+                    f" HTTP "
+                    f"{response.status}"
                 )
 
     except urllib.error.HTTPError as error:
@@ -124,13 +189,17 @@ def send_to_discord(
         )
 
         raise RuntimeError(
-            "Discordへの送信に失敗しました。"
-            f"HTTP {error.code}: {body}"
+            "Discordへの送信に"
+            "失敗しました。"
+            f" HTTP {error.code}: "
+            f"{body}"
         ) from error
 
     except urllib.error.URLError as error:
         raise RuntimeError(
-            f"Discordへの接続に失敗しました: {error.reason}"
+            "Discordへの接続に"
+            "失敗しました: "
+            f"{error.reason}"
         ) from error
 
 
@@ -138,31 +207,71 @@ def should_send(
     reminder: dict,
     now: datetime,
 ) -> bool:
-    if not reminder.get("enabled", False):
+    """
+    現在の日付が
+    リマインダー対象日か確認する。
+
+    GitHub Actionsは実行開始が
+    数分ずれる可能性があるため、
+    時刻の完全一致判定はしない。
+
+    時刻はscheduler.yml側で管理し、
+    Python側では日付のみ確認する。
+    """
+
+    if not reminder.get(
+        "enabled",
+        False,
+    ):
         return False
 
-    schedule = reminder.get("schedule", {})
+    schedule = reminder.get(
+        "schedule",
+        {},
+    )
 
-    if schedule.get("type") != "monthly":
-        return False
-
-    try:
-        expected_day = int(schedule["day"])
-        expected_time = str(schedule["time"])
-
-    except (KeyError, TypeError, ValueError):
+    if schedule.get(
+        "type"
+    ) != "monthly":
         print(
-            "スケジュール設定が不正です:",
-            reminder.get("id", "unknown"),
+            "未対応のschedule type:",
+            reminder.get(
+                "id",
+                "unknown",
+            ),
         )
         return False
 
-    current_time = now.strftime("%H:%M")
+    try:
+        expected_day = int(
+            schedule["day"]
+        )
 
-    return (
-        now.day == expected_day
-        and current_time == expected_time
-    )
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+    ):
+        print(
+            "日付設定が不正です:",
+            reminder.get(
+                "id",
+                "unknown",
+            ),
+        )
+        return False
+
+    if not 1 <= expected_day <= 31:
+        print(
+            "日付が範囲外です:",
+            reminder.get(
+                "id",
+                "unknown",
+            ),
+        )
+        return False
+
+    return now.day == expected_day
 
 
 def send_reminder(
@@ -170,30 +279,191 @@ def send_reminder(
     reminder: dict,
     now: datetime,
 ) -> None:
-    destination = reminder.get("destination", "staff")
-    webhook_url = webhooks.get(destination)
+    """
+    リマインダー1件を送信する。
+    """
+
+    reminder_id = reminder.get(
+        "id",
+        "unknown",
+    )
+
+    destination = reminder.get(
+        "destination",
+        "staff",
+    )
+
+    webhook_url = webhooks.get(
+        destination,
+        "",
+    )
 
     if not webhook_url:
         raise RuntimeError(
-            f"送り先が不正です: {destination}"
+            "Discord Webhookが"
+            "設定されていません: "
+            f"{destination}"
         )
 
-    message_template = reminder.get("message", "")
-    formatted_message = format_message(
-        message_template,
-        now,
+    message_template = reminder.get(
+        "message",
+        "",
     )
+
+    if not message_template:
+        raise RuntimeError(
+            "メッセージが"
+            "設定されていません: "
+            f"{reminder_id}"
+        )
+
+    try:
+        formatted_message = (
+            format_message(
+                message_template,
+                now,
+            )
+        )
+
+    except KeyError as error:
+        raise RuntimeError(
+            "メッセージ内に"
+            "未対応の変数があります: "
+            f"{error}"
+        ) from error
 
     send_to_discord(
         webhook_url=webhook_url,
-        mention=reminder.get("mention", ""),
+        mention=reminder.get(
+            "mention",
+            "",
+        ),
         message=formatted_message,
     )
 
 
+def run_test(
+    reminders: list,
+    webhooks: dict[str, str],
+    now: datetime,
+) -> None:
+    """
+    手動テスト送信。
+
+    enabled=true の
+    最初のリマインダーを
+    日付に関係なく送信する。
+    """
+
+    enabled_reminders = [
+        reminder
+        for reminder in reminders
+        if reminder.get(
+            "enabled",
+            False,
+        )
+    ]
+
+    if not enabled_reminders:
+        raise RuntimeError(
+            "テスト送信できる"
+            "有効なリマインダーが"
+            "ありません。"
+        )
+
+    reminder = (
+        enabled_reminders[0]
+    )
+
+    reminder_id = reminder.get(
+        "id",
+        "unknown",
+    )
+
+    print(
+        "【テスト送信】",
+        reminder_id,
+    )
+
+    send_reminder(
+        webhooks=webhooks,
+        reminder=reminder,
+        now=now,
+    )
+
+    print(
+        "テスト送信成功:",
+        reminder_id,
+    )
+
+
+def run_scheduled(
+    reminders: list,
+    webhooks: dict[str, str],
+    now: datetime,
+) -> None:
+    """
+    通常の自動送信。
+    """
+
+    sent_count = 0
+
+    for reminder in reminders:
+        reminder_id = reminder.get(
+            "id",
+            "unknown",
+        )
+
+        if not reminder.get(
+            "enabled",
+            False,
+        ):
+            print(
+                "無効のためスキップ:",
+                reminder_id,
+            )
+            continue
+
+        if not should_send(
+            reminder,
+            now,
+        ):
+            print(
+                "本日は送信対象外:",
+                reminder_id,
+            )
+            continue
+
+        print(
+            "送信開始:",
+            reminder_id,
+        )
+
+        send_reminder(
+            webhooks=webhooks,
+            reminder=reminder,
+            now=now,
+        )
+
+        print(
+            "送信成功:",
+            reminder_id,
+        )
+
+        sent_count += 1
+
+    print(
+        "送信件数:",
+        sent_count,
+    )
+
+
 def main() -> None:
+    """
+    メイン処理。
+    """
+
     config = load_config()
-    webhooks = load_webhooks()
 
     timezone_name = config.get(
         "timezone",
@@ -201,68 +471,58 @@ def main() -> None:
     )
 
     try:
-        timezone = ZoneInfo(timezone_name)
+        timezone = ZoneInfo(
+            timezone_name
+        )
 
     except Exception as error:
         raise RuntimeError(
-            f"タイムゾーン設定が不正です: {timezone_name}"
+            "タイムゾーン設定が"
+            "不正です: "
+            f"{timezone_name}"
         ) from error
 
-    now = datetime.now(timezone)
+    now = datetime.now(
+        timezone
+    )
 
-    reminders = config.get("reminders", [])
+    print(
+        "現在時刻:",
+        now.strftime(
+            "%Y-%m-%d "
+            "%H:%M:%S %Z"
+        ),
+    )
 
-    if not isinstance(reminders, list):
+    reminders = config.get(
+        "reminders",
+        [],
+    )
+
+    if not isinstance(
+        reminders,
+        list,
+    ):
         raise RuntimeError(
-            "remindersは配列で指定してください。"
+            "remindersは"
+            "配列で指定してください。"
         )
 
-    test_mode = "--test" in sys.argv
+    webhooks = load_webhooks()
 
-    if test_mode:
-        if not reminders:
-            raise RuntimeError(
-                "テスト送信できるリマインダーがありません。"
-            )
-
-        reminder = reminders[0]
-
-        send_reminder(
+    if "--test" in sys.argv:
+        run_test(
+            reminders=reminders,
             webhooks=webhooks,
-            reminder=reminder,
             now=now,
-        )
-
-        print(
-            "テスト送信しました:",
-            reminder.get("id", "unknown"),
         )
         return
 
-    sent_count = 0
-
-    for reminder in reminders:
-        if not should_send(reminder, now):
-            continue
-
-        send_reminder(
-            webhooks=webhooks,
-            reminder=reminder,
-            now=now,
-        )
-
-        print(
-            "送信しました:",
-            reminder.get("id", "unknown"),
-        )
-
-        sent_count += 1
-
-    print(
-        "処理完了。現在時刻: "
-        f"{now.strftime('%Y-%m-%d %H:%M:%S %Z')}"
+    run_scheduled(
+        reminders=reminders,
+        webhooks=webhooks,
+        now=now,
     )
-    print(f"送信件数: {sent_count}")
 
 
 if __name__ == "__main__":
