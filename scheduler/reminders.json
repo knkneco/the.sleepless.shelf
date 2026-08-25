@@ -1,29 +1,29 @@
 {
-	"timezone": "Asia/Tokyo",
-	"reminders": [
-		{
-			"id": "shuffle-roll-call",
-			"enabled": true,
-			"destination": "staff",
-			"schedule": {
-				"type": "monthly",
-				"day": 25,
-				"time": "17:00"
-			},
-			"mention": "<@&1389609529464979556> <@&1389609577838022706> <@&1394660891097829568> <@&1389968273491234877>",
-			"message": "💬{next_month}月点呼・シャッフル確認\n￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣\n点呼および{next_month}月シャッフルの出欠をとります📖´-\n※{month_after_next}月後半投稿予定\n\nリアクションは <:sanka:1377053545718747276>・<:fusanka:1377054198482468894> にてお願いします。\n（点呼も兼ねているので必須です）\nシャッフル詳細についてはこちらhttps://discord.com/channels/1376262825978363954/1376262826653515928/1389780269594181733\n\n回答は{current_month}月28日24時まで、よろしくお願いします！\n\n参加→ <:sanka:1377053545718747276>、不参加→ <:fusanka:1377054198482468894>"
-		},
-		{
-			"id": "public-reminder",
-			"enabled": false,
-			"destination": "public",
-			"schedule": {
-				"type": "monthly",
-				"day": 1,
-				"time": "20:00"
-			},
-			"mention": "",
-			"message": "📢 全体公開チャンネルへのテスト通知です！テストなので無視してください＞＜"
+  "timezone": "Asia/Tokyo",
+  "reminders": [
+    {
+      "id": "shuffle-roll-call",
+      "enabled": true,
+      "destination": "staff",
+      "schedule": {
+        "type": "monthly",
+        "day": 25,
+        "time": "17:00"
+      },
+      "mention": "<@&1389609529464979556> <@&1389609577838022706> <@&1394660891097829568> <@&1389968273491234877>",
+      "message": "💬{next_month}月点呼・シャッフル確認\n￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣\n点呼および{next_month}月シャッフルの出欠をとります📖´-\n※{month_after_next}月後半投稿予定\n\nリアクションは <:sanka:1377053545718747276>・<:fusanka:1377054198482468894> にてお願いします。\n（点呼も兼ねているので必須です）\nシャッフル詳細についてはこちらhttps://discord.com/channels/1376262825978363954/1376262826653515928/1389780269594181733\n\n回答は{current_month}月28日24時まで、よろしくお願いします！\n\n参加→ <:sanka:1377053545718747276>、不参加→ <:fusanka:1377054198482468894>"
+    },
+    {
+      "id": "public-reminder",
+      "enabled": false,
+      "destination": "public",
+      "schedule": {
+        "type": "monthly",
+        "day": 1,
+        "time": "20:00"
+      },
+      "mention": "",
+      "message": "📢 全体公開チャンネルへのテスト通知です！テストなので無視してください＞＜"
     }
-	]
+  ]
 }
