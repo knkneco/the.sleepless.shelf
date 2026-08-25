@@ -8,7 +8,7 @@ on:
   # 08:00 UTC = 17:00 JST
   # 毎月25日の17:00ごろに実行
   schedule:
-    - cron: "0 8 25 * *"
+    - cron: "0 8 26 * *"
 
 jobs:
   reminder:
