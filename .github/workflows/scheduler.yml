@@ -1,8 +1,12 @@
 name: The Sleepless Shelf Scheduler
 
 on:
+  # GitHub画面から手動実行できる
   workflow_dispatch:
 
+  # GitHub Actions の cron は UTC
+  # 08:00 UTC = 17:00 JST
+  # 毎月25日の17:00ごろに実行
   schedule:
     - cron: "0 8 25 * *"
 
@@ -19,6 +23,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Actions画面から手動実行した場合
+      # 日付に関係なく、有効なリマインダーを1件テスト送信
       - name: Test Send
         if: github.event_name == 'workflow_dispatch'
         env:
@@ -27,6 +33,7 @@ jobs:
         run: |
           python scheduler/send_reminder.py --test
 
+      # 毎月25日の自動実行
       - name: Scheduled Send
         if: github.event_name == 'schedule'
         env:
