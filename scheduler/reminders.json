@@ -4,7 +4,7 @@
     {
       "id": "shuffle-roll-call",
       "enabled": true,
-      "destination": "rollcall"
+      "destination": "rollcall",
       "schedule": {
         "type": "monthly",
         "day": 25,
