@@ -35,11 +35,12 @@ jobs:
         run: |
           python scheduler/send_reminder.py --test
 
-      # 毎月25日の自動実行
+      # 毎月定期の自動実行
       - name: Scheduled Send
         if: github.event_name == 'schedule'
         env:
           DISCORD_WEBHOOK_STAFF: ${{ secrets.DISCORD_WEBHOOK_STAFF }}
           DISCORD_WEBHOOK_PUBLIC: ${{ secrets.DISCORD_WEBHOOK_PUBLIC }}
+          DISCORD_WEBHOOK_ROLLCALL: ${{ secrets.DISCORD_WEBHOOK_ROLLCALL }}
         run: |
           python scheduler/send_reminder.py
