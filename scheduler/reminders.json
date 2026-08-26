@@ -24,6 +24,18 @@
       },
       "mention": "",
       "message": "📢 全体公開チャンネルへのテスト通知です！テストなので無視してください＞＜"
+    },
+    {
+      "id": "rollcall-check-staff",
+      "enabled": true,
+      "destination": "staff",
+      "schedule": {
+        "type": "monthly",
+        "day": 29,
+        "time": "17:00"
+      },
+      "mention": "<@&1379023911747977247>",
+      "message": "📋 点呼確認\n\n点呼の回答状況をご確認ください！"
     }
   ]
 }
