@@ -9,6 +9,7 @@ on:
   # 毎月25日の17:00ごろに実行
   schedule:
     - cron: "0 8 26 * *"
+    - cron: "0 8 29 * *"
 
 jobs:
   reminder:
