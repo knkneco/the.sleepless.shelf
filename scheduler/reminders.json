@@ -4,10 +4,10 @@
     {
       "id": "shuffle-roll-call",
       "enabled": true,
-      "destination": "staff",
+      "destination": "rollcall"
       "schedule": {
         "type": "monthly",
-        "day": 26,
+        "day": 25,
         "time": "17:00"
       },
       "mention": "<@&1389609529464979556> <@&1389609577838022706> <@&1394660891097829568> <@&1389968273491234877>",
