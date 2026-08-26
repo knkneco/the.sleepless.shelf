@@ -115,6 +115,10 @@ def load_webhooks() -> dict[str, str]:
             "DISCORD_WEBHOOK_PUBLIC",
             "",
         ),
+        "rollcall": os.environ.get(
+            "DISCORD_WEBHOOK_ROLLCALL",
+            "",
+        ),
     }
 
 
