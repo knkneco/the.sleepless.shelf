@@ -30,6 +30,7 @@ jobs:
         env:
           DISCORD_WEBHOOK_STAFF: ${{ secrets.DISCORD_WEBHOOK_STAFF }}
           DISCORD_WEBHOOK_PUBLIC: ${{ secrets.DISCORD_WEBHOOK_PUBLIC }}
+          DISCORD_WEBHOOK_ROLLCALL: ${{ secrets.DISCORD_WEBHOOK_ROLLCALL }}
         run: |
           python scheduler/send_reminder.py --test
 
